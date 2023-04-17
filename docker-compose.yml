@@ -16,9 +16,9 @@ services:
   mongo:
     image: mongo:latest
     volumes:
-     - flaskapp:/data/db/
+     - mongovolume:/data/db/
     ports:
       - 27017:27017
 
 volumes:
-  flaskapp:
+  mongovolume:
