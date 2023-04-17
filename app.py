@@ -4,11 +4,12 @@ from bson.objectid import ObjectId # For ObjectId to work
 from bson.errors import InvalidId # For catching InvalidId exception for ObjectId
 import os
 
-#mongodb_host = os.environ.get('MONGO_HOST', 'localhost')
-mongodb_host = os.environ.get('MONGO_HOST', 'db')
+mongodb_host = os.environ.get('MONGO_HOST', 'localhost')
+#mongodb_host = os.environ.get('MONGO_HOST', 'db')
 mongodb_port = int(os.environ.get('MONGO_PORT', '27017'))
-client = MongoClient(mongodb_host, mongodb_port, username='root',
-		     password='pass', authSource='admin')    #Configure the connection to the database
+client = MongoClient(mongodb_host, mongodb_port)
+#client = MongoClient(mongodb_host, mongodb_port, username='root',
+#		     password='pass', authSource='admin')    #Configure the connection to the database
 db = client.camp2016    #Select the database
 todos = db.todo #Select the collection
 
@@ -125,7 +126,7 @@ if __name__ == "__main__":
 	env = os.environ.get('FLASK_ENV', 'development')
 	port = int(os.environ.get('PORT', 5000))
 	debug = False if env == 'production' else True
-	#app.run(debug=True)
-	#app.run(port=port, debug=debug)
-	app.run(host="0.0.0.0", port=5000, debug=debug)
+	app.run(debug=True)
+	app.run(port=port, debug=debug)
+	#app.run(host="0.0.0.0", port=5000, debug=debug)
 	# Careful with the debug mode..
