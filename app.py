@@ -1,17 +1,17 @@
-from flask import Flask, render_template,request,redirect,url_for # For flask implementation
+from flask import Flask, render_template,request,redirect,url_for, jsonify # For flask implementation
 from pymongo import MongoClient # Database connector
 from bson.objectid import ObjectId # For ObjectId to work
 from bson.errors import InvalidId # For catching InvalidId exception for ObjectId
 import os
 
 mongodb_host = os.environ.get('MONGO_HOST', 'localhost')
-#mongodb_host = os.environ.get('MONGO_HOST', 'db')
 mongodb_port = int(os.environ.get('MONGO_PORT', '27017'))
-client = MongoClient(mongodb_host, mongodb_port)
-#client = MongoClient(mongodb_host, mongodb_port, username='root',
-#		     password='pass', authSource='admin')    #Configure the connection to the database
+client = MongoClient(mongodb_host, mongodb_port)  #Configure the connection to the database
 db = client.camp2016    #Select the database
 todos = db.todo #Select the collection
+
+fail_health = False
+fail_ready = False
 
 app = Flask(__name__)
 title = "TODO with Flask"
@@ -22,6 +22,32 @@ def redirect_url():
 	return request.args.get('next') or \
 		request.referrer or \
 		url_for('index')
+
+@app.route('/fail-liveness')
+def fail_liveness():
+	global fail_health
+	fail_health = True
+	return "Failing liveness check", 200
+
+@app.route('/healthz')
+def healthz():
+	print("fail_liveness value:", fail_liveness)
+	if fail_health:
+		return "Unhealthy", 500
+	return jsonify({"status": "healthy"}), 200
+
+@app.route('/fail-readiness')
+def fail_readiness():
+	global fail_ready
+	fail_ready = True
+	return "Failing readiness check", 200
+
+@app.route('/ready')
+def ready():
+	if fail_ready:
+		return "Not Ready", 500
+	else:
+		return jsonify({"status": "ready"}), 200
 
 @app.route("/list")
 def lists ():
