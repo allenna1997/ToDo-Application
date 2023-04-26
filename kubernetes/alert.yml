@@ -1,0 +1,18 @@
+apiVersion: monitoring.coreos.com/v1alpha1
+kind: AlertmanagerConfig
+metadata:
+  name: alert-config
+  labels:
+    resource: prometheus
+spec:
+  receivers:
+    - name: "slack"
+      slackConfigs:
+        - channel: '#testing'
+          text: "{{ range .Alerts }}{{ .Annotations.summary }}\n{{ end }}"
+          title: "{{ .CommonAnnotations.summary }}"
+  route:
+    groupBy: ["job"]
+    groupWait: 30s
+    groupInterval: 5m
+    receiver: "slack"

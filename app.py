@@ -3,6 +3,7 @@ from pymongo import MongoClient # Database connector
 from bson.objectid import ObjectId # For ObjectId to work
 from bson.errors import InvalidId # For catching InvalidId exception for ObjectId
 import os
+from prometheus_flask_exporter import PrometheusMetrics
 
 mongodb_host = os.environ.get('MONGO_HOST', 'localhost')
 mongodb_port = int(os.environ.get('MONGO_PORT', '27017'))
@@ -17,6 +18,8 @@ app = Flask(__name__)
 title = "TODO with Flask"
 heading = "ToDo Reminder"
 #modify=ObjectId()
+
+metrics = PrometheusMetrics(app)
 
 def redirect_url():
 	return request.args.get('next') or \

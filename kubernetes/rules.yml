@@ -1,0 +1,19 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: flask-app-rules
+  labels:
+    release: prometheus
+spec:
+  groups:
+  - name: flask-app
+    rules:
+    - alert: FlaskAppContainerNotReady
+      expr: sum(kube_pod_container_status_ready{pod=~"flask-app-.*"}) by (pod) < 1
+      for: 1m
+      labels:
+        severity: critical
+        receiver: slack
+      annotations:
+        summary: "Flask app container in pod {{ $labels.pod }} not ready"
+        description: "The Flask app container in pod {{ $labels.pod }} is not ready. Check the pod logs and application status."
